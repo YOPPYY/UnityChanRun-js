@@ -1,0 +1,16 @@
+{
+"frame": {
+"width": 64,
+"height": 64,
+"cols": 4,
+"rows": 4
+},
+
+"animations" : {
+"walk": {
+"frames": [4,5,6,7,8,9,10,11],
+"next": "walk",
+"frequency": 6
+}
+}
+}
