@@ -1,55 +1,84 @@
 // phina.js をグローバル領域に展開
 phina.globalize();
 
-var SCREEN_WIDTH = 640;
-var SCREEN_HEIGHT = 960;
+var SCREEN_WIDTH = 960;
+var SCREEN_HEIGHT = 640;
 
 var sprite;
-
+var anim;
+var anim_e;
+var bg=[];
 var ASSETS = {
   // 画像
   image: {
     'chara': 'img/UnityChan.png',
+    'uni': 'img/uni.png',
     'sky': 'img/BG_01.png',
     'ground': 'img/BG_02.png',
   },
   // スプライトシート
   spritesheet: {
     'char_sprite': 'img/chara.tmss',
-
+    'uni_sprite': 'img/uni.tmss'
   },
 };
 
 phina.define('Main', {
   superClass: 'DisplayScene',
-  init: function() {
-    this.superInit();
+  init: function(option) {
+    this.superInit(option);
     var self=this;
 
     // 背景
     this.backgroundColor = 'skyblue';
 
     var bg =  DisplayElement().addChildTo(this);
+    var e =  DisplayElement().addChildTo(this);
     var group =  DisplayElement().addChildTo(this);
 
-    var shape = Shape().setSize(640,50).setPosition(320,960-25).addChildTo(bg);
+    var shape = Shape().setSize(SCREEN_WIDTH,50).setPosition(SCREEN_WIDTH/2,SCREEN_HEIGHT-25).addChildTo(bg);
 
-    //var ground = Sprite('ground', 640, 240).setPosition(320,840).addChildTo(bg);
+    for(var i=0;i<2;i++){
+      bg[i] = Sprite('sky', 256, 256).addChildTo(bg);
+      bg[i].setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
+      bg[i].setPosition(SCREEN_WIDTH/2+SCREEN_WIDTH*i,SCREEN_HEIGHT/2);
+      bg[i].update=function(){
+        this.x-=2.5;
+        if(this.x==-SCREEN_WIDTH/2){
+          this.x=SCREEN_WIDTH/2+SCREEN_WIDTH;
+        }
+      }
+    }
+
+    for(var i=0;i<2;i++){
+      bg[i] = Sprite('ground', 256, 256).addChildTo(bg);
+      bg[i].setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
+      bg[i].setPosition(SCREEN_WIDTH/2+SCREEN_WIDTH*i,SCREEN_HEIGHT/2);
+      bg[i].update=function(){
+        this.x-=7.5;
+        if(this.x==-SCREEN_WIDTH/2){
+          this.x=SCREEN_WIDTH/2+SCREEN_WIDTH;
+        }
+      }
+    }
+
 
     // スプライト画像作成
-     sprite = Sprite('chara', 32, 32).addChildTo(group);
+    sprite = Sprite('chara', 32, 32).addChildTo(group);
     // スプライトにフレームアニメーションをアタッチ
-    var anim = FrameAnimation('char_sprite').attachTo(sprite);
+    anim = FrameAnimation('char_sprite').attachTo(sprite);
     anim.fit = false;
-    sprite.setSize(100,100);
+    sprite.setSize(256,256);
     // アニメーションを指定
     anim.gotoAndPlay('walk');
 
     // 初期位置
-    sprite.x = SCREEN_WIDTH/2;
+    sprite.x = SCREEN_WIDTH/4;
     sprite.y = SCREEN_HEIGHT-100;
-    anim.ss.getAnimation('walk').frequency = 3;
+    //anim.ss.getAnimation('walk').frequency = 4;
     sprite.vy = -10;
+    sprite.collider.setSize(64, 160).offset(0,0).show();
+
 
     sprite.update= function(){
       // 下に移動
@@ -57,31 +86,84 @@ phina.define('Main', {
       this.y += this.vy;
 
       // 地面に着いたら反発する
-      if (this.bottom > 960) {
-        this.bottom = 960;
+      if (this.bottom > SCREEN_HEIGHT) {
+        this.bottom = SCREEN_HEIGHT;
         this.vy =0;
+        if(anim.currentAnimation.next!='walk'){anim.gotoAndPlay('walk')};
       }
 
+      /*//前進
       if (this.x < 320) {
-        this.x +=5;
-      }
-
-      if (this.x > 320) {
-        this.x=320;
-        this.vx =0;
-      }
+      this.x +=5;
     }
-  },
 
-   onpointstart: function() {
-     if (sprite.bottom == 960) {
-     //sprite.vy =-20;
-     sprite.x=120;
-   }
- }
+    if (this.x > 320) {
+    this.x=320;
+    this.vx =0;
+  }*/
+}
+
+// 更新処理
+this.update = function(app) {
+  // 経過フレーム数表示
+  if(app.frame%100==0){
+    var enemy = Sprite('uni', 32, 32).addChildTo(e);
+    enemy.setSize(128,128);
+    anim_e=FrameAnimation('uni_sprite').attachTo(enemy);
+    anim_e.fit = false;
+    anim_e.gotoAndPlay('walk');
+    enemy.setPosition(SCREEN_WIDTH,SCREEN_HEIGHT-90);
+    enemy.collider.setSize(96, 96).offset(0,0).show();
+    enemy.update=function(){
+      this.x-=7.5;
+      if(this.right<0){
+        this.remove();
+      }
+
+      //hit
+      if (enemy.collider.hitTest(sprite.collider)) {
+       //console.log("hit");
+       anim.gotoAndPlay('hit');
+       anim_e.gotoAndPlay('hit');
+       //SoundManager.stopMusic('bgm');
+       //SoundManager.play('hit');
+       self.app.pushScene(GameOver());
+     }
+
+    }
+  }
+
+
+};
+
+
+},
+
+onpointstart: function() {
+  if (sprite.bottom == SCREEN_HEIGHT) {
+    sprite.vy =-2.5*9.8;
+    anim.gotoAndPlay('jump');
+  }
+},
+
+update:function(){
+
+}
 
 
 
+});
+
+phina.define("GameOver", {
+  // 継承
+  superClass: 'DisplayScene',
+  // コンストラクタ
+  init: function(score) {
+    // 親クラス初期化
+    this.superInit();
+    // 背景を半透明化
+    this.backgroundColor = 'rgba(0, 0, 0, 0)';
+}
 });
 
 // メイン処理
@@ -89,17 +171,21 @@ phina.main(function() {
 
   // アプリケーションを生成
   var app = GameApp({
+    fps: 60, // fps指定
     query: '#canvas',
     // Scene01 から開始
     startLabel: 'main',
     assets: ASSETS,
+    width:960,
+    height:640,
     // シーンのリストを引数で渡す
     scenes: [
       {
         className: 'Main',
         label: 'main',
       },
-    ]
+    ],
+
   });
 
   app.domElement.addEventListener('touchend', function dummy() {
