@@ -194,7 +194,8 @@ onpointstart: function() {
     on=false;
 
     var v = Math.floor(Math.random()*2);
-    SoundManager.play('jump'+v);
+    console.log(v)
+    SoundManager.play('jump'+(v+1));
   }
 },
 
