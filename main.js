@@ -9,7 +9,7 @@ var int =90;
 var player;
 var anim;
 var anim_e;
-var speed=1.0;
+var queue;
 
 var ASSETS = {
   // 画像
@@ -199,14 +199,12 @@ phina.define('Main', {
 enemysporn(10);
 // 更新処理
 this.update = function(app) {
-  // 経過フレーム数表示
   score++;
-      speed+=1;
   label.text='スコア：'+score;
 };
 
 function enemysporn(spd){
-  var front;
+
   var enemy;
   enemy = Sprite('uni', 32, 32).addChildTo(e);
   enemy.setSize(128,128);
@@ -219,8 +217,8 @@ function enemysporn(spd){
   enemy.collider.setSize(96, 96).offset(0,0);
   enemy.update=function(){
     this.x-=this.speed;
-    if(this.x<player.x && this.flag==true){ //Collider準拠
-      var s=[5,10,15];
+    if(this.x+64<player.x-32 && this.flag==true){ //Collider準拠
+      var s=[10,15,20];
       var sp=Math.floor(Math.random()*3); // 5, 7.5, 10, 12.5, 15
       spd=s[sp];
       this.flag=false;
