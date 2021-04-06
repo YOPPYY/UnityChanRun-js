@@ -16,6 +16,7 @@ var ASSETS = {
   image: {
     'chara': 'img/UnityChan.png',
     'uni': 'img/uni.png',
+    'uni2': 'img/uni2.png',
     'sky': 'img/BG_01.png',
     'ground': 'img/BG_02.png',
     'block':'img/block1.png'
@@ -185,79 +186,69 @@ phina.define('Main', {
         }
       }
 
+    }
+    enemysporn(10);
+    // 更新処理
+    this.update = function(app) {
+      score++;
+      label.text='スコア：'+score;
+    };
 
-      /*//前進
-      if (this.x < 320) {
-      this.x +=5;
+    function enemysporn(spd){
+
+      var enemy;
+      enemy = Sprite('uni', 32, 32).addChildTo(e);
+      enemy.setSize(128,128);
+      enemy.flag=true;
+      enemy.speed=spd;
+      anim_e=FrameAnimation('uni_sprite').attachTo(enemy);
+      anim_e.fit = false;
+      anim_e.gotoAndPlay('walk');
+      enemy.setPosition(SCREEN_WIDTH,SCREEN_HEIGHT-90);
+      enemy.collider.setSize(96, 96).offset(0,0);
+      enemy.update=function(){
+        this.x-=this.speed;
+        if(this.x-64<player.x+32 && this.flag==true){ //Collider準拠
+          var s=[7.5, 9, 10, 11, 12.5];
+          var sp=Math.floor(Math.random()*s.length); // 5, 7.5, 10, 12.5, 15
+          spd=s[sp];
+          this.flag=false;
+          console.log(spd)
+          enemysporn(spd);
+        }
+        if(this.right<0){this.remove();}
+
+        //hit
+        if (enemy.collider.hitTest(player.collider)) {
+          //console.log("hit");
+          anim.gotoAndPlay('hit');
+          anim_e.gotoAndPlay('hit');
+          SoundManager.play('ouch');
+          //SoundManager.stopMusic('bgm');
+          //SoundManager.play('hit');
+          self.app.pushScene(GameOver(score));
+        }
+
+      }
     }
 
-    if (this.x > 320) {
-    this.x=320;
-    this.vx =0;
-  }*/
-}
-enemysporn(10);
-// 更新処理
-this.update = function(app) {
-  score++;
-  label.text='スコア：'+score;
-};
 
-function enemysporn(spd){
+  },
 
-  var enemy;
-  enemy = Sprite('uni', 32, 32).addChildTo(e);
-  enemy.setSize(128,128);
-  enemy.flag=true;
-  enemy.speed=spd;
-  anim_e=FrameAnimation('uni_sprite').attachTo(enemy);
-  anim_e.fit = false;
-  anim_e.gotoAndPlay('walk');
-  enemy.setPosition(SCREEN_WIDTH,SCREEN_HEIGHT-90);
-  enemy.collider.setSize(96, 96).offset(0,0);
-  enemy.update=function(){
-    this.x-=this.speed;
-    if(this.x-64<player.x+32 && this.flag==true){ //Collider準拠
-      var s=[7.5, 9, 10, 11, 12.5];
-      var sp=Math.floor(Math.random()*s.length); // 5, 7.5, 10, 12.5, 15
-      spd=s[sp];
-      this.flag=false;
-      console.log(spd)
-      enemysporn(spd);
+  onpointstart: function() {
+    if (SCREEN_HEIGHT-player.bottom<50) { //設置判定緩め
+      player.vy =-2.5*9.8;
+      anim.gotoAndPlay('jump');
+
+      var voice = 1+Math.floor(Math.random()*2);
+      var str = 'jump'+voice;
+      SoundManager.play(str);
     }
-    if(this.right<0){this.remove();}
+  },
 
-    //hit
-    if (enemy.collider.hitTest(player.collider)) {
-      //console.log("hit");
-      anim.gotoAndPlay('hit');
-      anim_e.gotoAndPlay('hit');
-      SoundManager.play('ouch');
-      //SoundManager.stopMusic('bgm');
-      //SoundManager.play('hit');
-      self.app.pushScene(GameOver(score));
-    }
+  update:function(app){
 
-  }
-}
-
-
-},
-
-onpointstart: function() {
-  if (SCREEN_HEIGHT-player.bottom<50) { //設置判定緩め
-    player.vy =-2.5*9.8;
-    anim.gotoAndPlay('jump');
-
-    var voice = 1+Math.floor(Math.random()*2);
-    var str = 'jump'+voice;
-    SoundManager.play(str);
-  }
-},
-
-update:function(app){
-
-},
+  },
 
 
 

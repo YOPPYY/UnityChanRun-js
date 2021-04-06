@@ -1,0 +1,25 @@
+{
+"frame": {
+"width": 32,
+"height": 32,
+"cols": 3,
+"rows": 1
+},
+
+"animations" : {
+
+"walk": {
+"frames": [0,1],
+"next": "walk",
+"frequency": 6
+},
+
+"hit": {
+"frames": [2],
+"next": "hit",
+"frequency": 6
+}
+
+
+}
+}
