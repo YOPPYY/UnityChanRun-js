@@ -197,10 +197,14 @@ phina.define('Main', {
     function enemysporn(spd){
 
       var enemy;
-      enemy = Sprite('uni', 32, 32).addChildTo(e);
+      var j = Math.floor(Math.random()*2);
+      var spr=''; if(!j){spr='uni2';} else{spr='uni';}
+      enemy = Sprite(spr, 32, 32).addChildTo(e);
       enemy.setSize(128,128);
       enemy.flag=true;
       enemy.speed=spd;
+      enemy.vy=0;
+      if(!j)enemy.jump=true;else{enemy.jump=false;}
       anim_e=FrameAnimation('uni_sprite').attachTo(enemy);
       anim_e.fit = false;
       anim_e.gotoAndPlay('walk');
@@ -208,8 +212,18 @@ phina.define('Main', {
       enemy.collider.setSize(96, 96).offset(0,0);
       enemy.update=function(){
         this.x-=this.speed;
+
+          this.vy += 0.98;
+          this.y += this.vy;
+        if(this.y>SCREEN_HEIGHT-90){this.y =SCREEN_HEIGHT-90; this.vy=0;}
+        if(this.x<SCREEN_WIDTH/2-64 && this.jump==true){
+          this.vy=-2.5*9.8;
+          this.jump=false;
+        }
+
+
         if(this.x-64<player.x+32 && this.flag==true){ //Collider準拠
-          var s=[7.5, 9, 10, 11, 12.5];
+          var s=[10, 11.25, 12.5];
           var sp=Math.floor(Math.random()*s.length); // 5, 7.5, 10, 12.5, 15
           spd=s[sp];
           this.flag=false;
