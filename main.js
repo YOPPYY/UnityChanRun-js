@@ -217,7 +217,7 @@ function enemysporn(spd){
   enemy.collider.setSize(96, 96).offset(0,0);
   enemy.update=function(){
     this.x-=this.speed;
-    if(this.x+64<player.x-32 && this.flag==true){ //Collider準拠
+    if(this.x-64<player.x+32 && this.flag==true){ //Collider準拠
       var s=[10,15,20];
       var sp=Math.floor(Math.random()*3); // 5, 7.5, 10, 12.5, 15
       spd=s[sp];
