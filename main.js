@@ -218,8 +218,8 @@ function enemysporn(spd){
   enemy.update=function(){
     this.x-=this.speed;
     if(this.x-64<player.x+32 && this.flag==true){ //Collider準拠
-      var s=[10,15,20];
-      var sp=Math.floor(Math.random()*3); // 5, 7.5, 10, 12.5, 15
+      var s=[7.5, 9, 10, 11, 12.5];
+      var sp=Math.floor(Math.random()*s.length); // 5, 7.5, 10, 12.5, 15
       spd=s[sp];
       this.flag=false;
       console.log(spd)
