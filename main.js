@@ -213,8 +213,8 @@ phina.define('Main', {
       enemy.update=function(){
         this.x-=this.speed;
 
-          this.vy += 0.98;
-          this.y += this.vy;
+        this.vy += 0.98;
+        this.y += this.vy;
         if(this.y>SCREEN_HEIGHT-90){this.y =SCREEN_HEIGHT-90; this.vy=0;}
         if(this.x<SCREEN_WIDTH/2-64 && this.jump==true){
           this.vy=-2.5*9.8;
